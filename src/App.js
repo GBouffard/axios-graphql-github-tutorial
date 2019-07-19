@@ -13,11 +13,11 @@ const axiosGitHubGraphQL = axios.create({
 });
 
 const GET_ISSUES_OF_REPOSITORY = `
-  {
-    organization(login: "the-road-to-learn-react") {
+  query ($organization: String!, $repository: String!) {
+    organization(login: $organization) {
       name
       url
-      repository(name: "the-road-to-learn-react") {
+      repository(name: $repository) {
         name
         url
         issues(last: 5) {
@@ -34,43 +34,20 @@ const GET_ISSUES_OF_REPOSITORY = `
   }
 `;
 
-const Repository = ({ repository }) => (
-  <div>
-    <p>
-      <strong>In Repository:</strong>
-      <a href={repository.url}>{repository.name}</a>
-    </p>
+const getIssuesOfRepository = path => {
+  // example nodejs/node
+  const [organization, repository] = path.split("/");
 
-    <ul>
-      {repository.issues.edges.map(issue => (
-        <li key={issue.node.id}>
-          <a href={issue.node.url}>{issue.node.title}</a>
-        </li>
-      ))}
-    </ul>
-  </div>
-);
-
-const Organization = ({ organization, errors }) => {
-  if (errors) {
-    return (
-      <p>
-        <strong>Something went wrong:</strong>
-        {errors.map(error => error.message).join(" ")}
-      </p>
-    );
-  }
-
-  return (
-    <div>
-      <p>
-        <strong>Issues from Organization:</strong>
-        <a href={organization.url}>{organization.name}</a>
-      </p>
-      <Repository repository={organization.repository} />
-    </div>
-  );
+  return axiosGitHubGraphQL.post("", {
+    query: GET_ISSUES_OF_REPOSITORY,
+    variables: { organization, repository }
+  });
 };
+
+const resolveIssuesQuery = queryResult => () => ({
+  organization: queryResult.data.data.organization,
+  errors: queryResult.data.errors
+});
 
 class App extends Component {
   state = {
@@ -80,7 +57,7 @@ class App extends Component {
   };
 
   componentDidMount() {
-    this.onFetchFromGitHub();
+    this.onFetchFromGitHub(this.state.path);
   }
 
   onChange = event => {
@@ -88,18 +65,15 @@ class App extends Component {
   };
 
   onSubmit = event => {
+    this.onFetchFromGitHub(this.state.path);
+
     event.preventDefault();
   };
 
-  onFetchFromGitHub = () => {
-    axiosGitHubGraphQL
-      .post("", { query: GET_ISSUES_OF_REPOSITORY })
-      .then(result =>
-        this.setState(() => ({
-          organization: result.data.data.organization,
-          errors: result.data.errors
-        }))
-      );
+  onFetchFromGitHub = path => {
+    getIssuesOfRepository(path).then(queryResult =>
+      this.setState(resolveIssuesQuery(queryResult))
+    );
   };
 
   render() {
@@ -107,7 +81,7 @@ class App extends Component {
 
     return (
       <div>
-        <h2>{TITLE}</h2>
+        <h1>{TITLE}</h1>
 
         <form onSubmit={this.onSubmit}>
           <label htmlFor="url">Show open issues for https://github.com/</label>
@@ -132,5 +106,43 @@ class App extends Component {
     );
   }
 }
+
+const Organization = ({ organization, errors }) => {
+  if (errors) {
+    return (
+      <p>
+        <strong>Something went wrong:</strong>
+        {errors.map(error => error.message).join(" ")}
+      </p>
+    );
+  }
+
+  return (
+    <div>
+      <p>
+        <strong>Issues from Organization:</strong>
+        <a href={organization.url}>{organization.name}</a>
+      </p>
+      <Repository repository={organization.repository} />
+    </div>
+  );
+};
+
+const Repository = ({ repository }) => (
+  <div>
+    <p>
+      <strong>In Repository:</strong>
+      <a href={repository.url}>{repository.name}</a>
+    </p>
+
+    <ul>
+      {repository.issues.edges.map(issue => (
+        <li key={issue.node.id}>
+          <a href={issue.node.url}>{issue.node.title}</a>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
 
 export default App;
