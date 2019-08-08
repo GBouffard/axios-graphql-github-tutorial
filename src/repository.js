@@ -37,7 +37,7 @@ const Repository = ({ repository, onFetchMoreIssues, onStarRepository }) => (
 
     <ul>
       {repository.issues.edges.map(issue => (
-        <IssueBulletPoint node={issue.node} />
+        <IssueBulletPoint node={issue.node} key={issue.node.title} />
       ))}
     </ul>
 

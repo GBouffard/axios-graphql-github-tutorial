@@ -28,7 +28,8 @@ const getIssuesOfRepository = (path, cursor) => {
   });
 };
 
-const resolveIssuesQuery = (queryResult, cursor) => state => {
+// const resolveIssuesQuery = (queryResult, cursor) => state => {
+const resolveIssuesQuery = (queryResult, cursor, organization) => {
   const { data, errors } = queryResult.data;
 
   if (!cursor) {
@@ -38,7 +39,7 @@ const resolveIssuesQuery = (queryResult, cursor) => state => {
     };
   }
 
-  const { edges: oldIssues } = state.organization.repository.issues;
+  const { edges: oldIssues } = organization.repository.issues;
   const { edges: newIssues } = data.organization.repository.issues;
   const updatedIssues = [...oldIssues, ...newIssues];
 
@@ -63,16 +64,15 @@ const addStarToRepository = repositoryId =>
     variables: { repositoryId }
   });
 
-const resolveAddStarMutation = mutationResult => state => {
+const resolveAddStarMutation = (mutationResult, organization) => {
   const { viewerHasStarred } = mutationResult.data.data.addStar.starrable;
-  const { totalCount } = state.organization.repository.stargazers;
+  const { totalCount } = organization.repository.stargazers;
 
   return {
-    ...state,
     organization: {
-      ...state.organization,
+      ...organization,
       repository: {
-        ...state.organization.repository,
+        ...organization.repository,
         viewerHasStarred,
         stargazers: {
           totalCount: totalCount + 1
@@ -88,16 +88,15 @@ const removeStarFromRepository = repositoryId =>
     variables: { repositoryId }
   });
 
-const resolveRemoveStarMutation = mutationResult => state => {
+const resolveRemoveStarMutation = (mutationResult, organization) => {
   const { viewerHasStarred } = mutationResult.data.data.removeStar.starrable;
-  const { totalCount } = state.organization.repository.stargazers;
+  const { totalCount } = organization.repository.stargazers;
 
   return {
-    ...state,
     organization: {
-      ...state.organization,
+      ...organization,
       repository: {
-        ...state.organization.repository,
+        ...organization.repository,
         viewerHasStarred,
         stargazers: {
           totalCount: totalCount - 1
