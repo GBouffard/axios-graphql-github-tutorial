@@ -1,6 +1,6 @@
 import React, { Fragment } from "react";
 
-const RepositoryHeader = ({ repository }) => (
+const RepositoryNameAndUrl = ({ repository }) => (
   <p>
     <strong>In Repository:</strong>
     <a href={repository.url}>{repository.name}</a>
@@ -31,7 +31,7 @@ const IssueBulletPoint = ({ node }) => (
 
 const Repository = ({ repository, onFetchMoreIssues, onStarRepository }) => (
   <Fragment>
-    <RepositoryHeader repository={repository} />
+    <RepositoryNameAndUrl repository={repository} />
 
     <StarButton repository={repository} onStarRepository={onStarRepository} />
 
