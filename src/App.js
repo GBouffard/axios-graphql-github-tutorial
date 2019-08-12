@@ -9,12 +9,6 @@ import {
   resolveRemoveStarMutation
 } from "./helper";
 
-// situation: refactored app in es6 and now more button only show results fora few seconds. Need to solve
-// something seems to refresh the page every time there is a change and might reset the carpet,
-// endCursor:  Y3Vyc29yOnYyOpHOERSfCQ==     <-- but always return this one since refactoring
-// App.js:43 endCursor:  Y3Vyc29yOnYyOpHOGNLv9A==    <-- returned this one as 2d call before
-// App.js:43 endCursor:  Y3Vyc29yOnYyOpHOGhoB4A==    <-- returned this one as 3rd call before
-
 import Organization from "./organization";
 
 const App = () => {
@@ -73,7 +67,7 @@ const App = () => {
 
   useEffect(() => {
     onFetchFromGitHub(path);
-  });
+  }, []);
 
   return (
     <div>
