@@ -1,26 +1,13 @@
-import React, { Fragment } from "react";
+import React, { Fragment } from 'react'
 
-import Repository from "./repository";
-
-const ErrorsComponent = ({ errors }) => (
-  <p>
-    <strong>Something went wrong:</strong>
-    {errors.map(error => error.message).join(" ")}
-  </p>
-);
-
-const RepositoryHeader = ({ organization }) => (
-  <p>
-    <strong>Issues from Organization:</strong>
-    <a href={organization.url}>{organization.name}</a>
-  </p>
-);
+import Repository from './repository'
+import { ErrorsComponent, RepositoryHeader } from './small-components'
 
 const Organization = ({
   organization,
   errors,
   onFetchMoreIssues,
-  onStarRepository
+  onStarButtonClick
 }) =>
   errors ? (
     <ErrorsComponent errors={errors} />
@@ -30,9 +17,9 @@ const Organization = ({
       <Repository
         repository={organization.repository}
         onFetchMoreIssues={onFetchMoreIssues}
-        onStarRepository={onStarRepository}
+        onStarButtonClick={onStarButtonClick}
       />
     </Fragment>
-  );
+  )
 
-export default Organization;
+export default Organization

@@ -36,7 +36,7 @@ const GET_REPOSITORY_ISSUES_GRAPHQL_QUERY = `
       }
     }
   }
-`;
+`
 
 const ADD_STAR_GRAPHQL_QUERY = `
   mutation ($repositoryId: ID!) {
@@ -46,7 +46,7 @@ const ADD_STAR_GRAPHQL_QUERY = `
       }
     }
   }
-`;
+`
 
 const REMOVE_STAR_GRAPHQL_QUERY = `
   mutation ($repositoryId: ID!) {
@@ -56,10 +56,10 @@ const REMOVE_STAR_GRAPHQL_QUERY = `
       }
     }
   }
-`;
+`
 
 export {
   GET_REPOSITORY_ISSUES_GRAPHQL_QUERY,
   ADD_STAR_GRAPHQL_QUERY,
   REMOVE_STAR_GRAPHQL_QUERY
-};
+}

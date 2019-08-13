@@ -1,21 +1,10 @@
-import React, { Fragment } from "react";
+import React, { Fragment } from 'react'
 
-const RepositoryNameAndUrl = ({ repository }) => (
-  <p>
-    <strong>In Repository:</strong>
-    <a href={repository.url}>{repository.name}</a>
-  </p>
-);
-
-const StarButton = ({ repository, onStarRepository }) => (
-  <button
-    type="button"
-    onClick={() => onStarRepository(repository.id, repository.viewerHasStarred)}
-  >
-    {repository.stargazers.totalCount}
-    {repository.viewerHasStarred ? " Unstar" : " Star"}
-  </button>
-);
+import {
+  RepositoryNameAndUrl,
+  StarButton,
+  MoreIssuesButton
+} from './small-components'
 
 const IssueBulletPoint = ({ node }) => (
   <li key={node.id}>
@@ -27,25 +16,29 @@ const IssueBulletPoint = ({ node }) => (
       ))}
     </ul>
   </li>
-);
+)
 
-const Repository = ({ repository, onFetchMoreIssues, onStarRepository }) => (
+const IssueBulletPointList = ({ repository }) => (
+  <ul>
+    {repository.issues.edges.map(issue => (
+      <IssueBulletPoint node={issue.node} key={issue.node.title} />
+    ))}
+  </ul>
+)
+
+const Repository = ({ repository, onFetchMoreIssues, onStarButtonClick }) => (
   <Fragment>
     <RepositoryNameAndUrl repository={repository} />
 
-    <StarButton repository={repository} onStarRepository={onStarRepository} />
+    <StarButton repository={repository} onClick={onStarButtonClick} />
 
-    <ul>
-      {repository.issues.edges.map(issue => (
-        <IssueBulletPoint node={issue.node} key={issue.node.title} />
-      ))}
-    </ul>
+    <IssueBulletPointList repository={repository} />
 
     <hr />
     {repository.issues.pageInfo.hasNextPage && (
-      <button onClick={onFetchMoreIssues}>More</button>
+      <MoreIssuesButton onClick={onFetchMoreIssues} />
     )}
   </Fragment>
-);
+)
 
-export default Repository;
+export default Repository

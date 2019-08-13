@@ -1,14 +1,13 @@
-import axios from "axios";
+import axios from 'axios'
 
 import {
   GET_REPOSITORY_ISSUES_GRAPHQL_QUERY,
   ADD_STAR_GRAPHQL_QUERY,
   REMOVE_STAR_GRAPHQL_QUERY
-} from "./graphql-queries";
+} from './graphql-queries'
 
-const apiBaseUrl = "https://api.github.com/graphql";
+const apiBaseUrl = 'https://api.github.com/graphql'
 
-// a personal access token from Github is needed
 const axiosGitHubGraphQL = axios.create({
   baseURL: apiBaseUrl,
   headers: {
@@ -16,32 +15,29 @@ const axiosGitHubGraphQL = axios.create({
       process.env.REACT_APP_GITHUB_PERSONAL_ACCESS_TOKEN
     }`
   }
-});
+})
 
 const getIssuesOfRepository = (path, cursor) => {
-  // example nodejs/node
-  const [organization, repository] = path.split("/");
+  const [organization, repository] = path.split('/')
 
-  return axiosGitHubGraphQL.post("", {
+  return axiosGitHubGraphQL.post('', {
     query: GET_REPOSITORY_ISSUES_GRAPHQL_QUERY,
     variables: { organization, repository, cursor }
-  });
-};
+  })
+}
 
-// const resolveIssuesQuery = (queryResult, cursor) => state => {
 const resolveIssuesQuery = (queryResult, cursor, organization) => {
-  const { data, errors } = queryResult.data;
+  const { data, errors } = queryResult.data
 
   if (!cursor) {
     return {
       organization: data.organization,
       errors
-    };
+    }
   }
 
-  const { edges: oldIssues } = organization.repository.issues;
-  const { edges: newIssues } = data.organization.repository.issues;
-  const updatedIssues = [...oldIssues, ...newIssues];
+  const { edges: oldIssues } = organization.repository.issues
+  const { edges: newIssues } = data.organization.repository.issues
 
   return {
     organization: {
@@ -50,23 +46,23 @@ const resolveIssuesQuery = (queryResult, cursor, organization) => {
         ...data.organization.repository,
         issues: {
           ...data.organization.repository.issues,
-          edges: updatedIssues
+          edges: [...oldIssues, ...newIssues]
         }
       }
     },
     errors
-  };
-};
+  }
+}
 
 const addStarToRepository = repositoryId =>
-  axiosGitHubGraphQL.post("", {
+  axiosGitHubGraphQL.post('', {
     query: ADD_STAR_GRAPHQL_QUERY,
     variables: { repositoryId }
-  });
+  })
 
 const resolveAddStarMutation = (mutationResult, organization) => {
-  const { viewerHasStarred } = mutationResult.data.data.addStar.starrable;
-  const { totalCount } = organization.repository.stargazers;
+  const { viewerHasStarred } = mutationResult.data.data.addStar.starrable
+  const { totalCount } = organization.repository.stargazers
 
   return {
     organization: {
@@ -79,18 +75,18 @@ const resolveAddStarMutation = (mutationResult, organization) => {
         }
       }
     }
-  };
-};
+  }
+}
 
 const removeStarFromRepository = repositoryId =>
-  axiosGitHubGraphQL.post("", {
+  axiosGitHubGraphQL.post('', {
     query: REMOVE_STAR_GRAPHQL_QUERY,
     variables: { repositoryId }
-  });
+  })
 
 const resolveRemoveStarMutation = (mutationResult, organization) => {
-  const { viewerHasStarred } = mutationResult.data.data.removeStar.starrable;
-  const { totalCount } = organization.repository.stargazers;
+  const { viewerHasStarred } = mutationResult.data.data.removeStar.starrable
+  const { totalCount } = organization.repository.stargazers
 
   return {
     organization: {
@@ -103,8 +99,8 @@ const resolveRemoveStarMutation = (mutationResult, organization) => {
         }
       }
     }
-  };
-};
+  }
+}
 
 export {
   getIssuesOfRepository,
@@ -113,4 +109,4 @@ export {
   resolveAddStarMutation,
   removeStarFromRepository,
   resolveRemoveStarMutation
-};
+}
